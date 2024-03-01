@@ -1,4 +1,6 @@
+> On laurie's machin
 
+-------
 laurie@BornToSecHackMe:~$ cat README 
 Diffuse this bomb!
 When you have all the password use it as "thor" user with ssh.
@@ -12,6 +14,7 @@ o
 4
 
 NO SPACE IN THE PASSWORD (password is case sensitive).
+------
 
 laurie@BornToSecHackMe:~$ ./bomb 
 Welcome this is my little bomb !!!! You have 6 stages with
@@ -29,38 +32,27 @@ Good work!  On to the next...
 4 2 6 3 1 5
 Congratulations! You've defused the bomb!
 
+## The result is :
 Publicspeakingisveryeasy.126241207201b2149opekmq426315
 
-the right one :
+## Knowing that there is an error, checking on Discord. Here is the right one :
 Publicspeakingisveryeasy.126241207201b2149opekmq426135
 
-- phase 1 :
-found on code
-- phase 2 :
-    2 est égal à (1+1) * 1
-    6 est égal à (2+1) * 2
-    24 est égal à (3+1) * 6
-    120 est égal à (4+1) * 24
-	720 est égal à (5+1) * 120
-- phase 3 : chatgpt
-- phase 4 : fibonnaci see the script
-- phase 5 and 6 find the ogic please
+> Getting on thor user
 
-## On thor user :
-turtle file, when searching on internet : found about the turtle module on python (look for the script turtle)
+## There is a turtle file. It's about the turtle module on python 
+## Found the word SLASH
 
-: word SLASH
-
-python3 digest.py
+> Look for the word's digest
+$$ python3 digest.py
 Original word: SLASH
-SHA-256 Hashed word: 2f4f10058af817252c4a9bc174d7b729538079f84f02a74160b3a42162d53e02
-MD5 Hashed word: 646da671ca01bb5d84dbb5fb2238dc8e
-SHA-1 Hashed word: 045db3637ddba59088ac97a1cabc374013dc7d0e
+SHA-256: 2f4f10058af817252c4a9bc174d7b729538079f84f02a74160b3a42162d53e02
+MD5 : 646da671ca01bb5d84dbb5fb2238dc8e
+SHA-1: 045db3637ddba59088ac97a1cabc374013dc7d0e
 
-The right one = MD5 hash
+## Using the MD5
 
 ## On zaz user:
-
 https://beta.hackndo.com/buffer-overflow/
 https://wiremask.eu/tools/buffer-overflow-pattern-generator/?
 
@@ -68,7 +60,7 @@ https://wiremask.eu/tools/buffer-overflow-pattern-generator/?
 Dump of assembler code for function main:
    0x080483f4 <+0>:     push   %ebp
    0x080483f5 <+1>:     mov    %esp,%ebp
-   0x080483f7 <+3>:     and    $0xfffffff0,%esp
+   0x080483f7 <+3>:     and    $0xfffffff0,%esp	
    0x080483fa <+6>:     sub    $0x90,%esp
    0x08048400 <+12>:    cmpl   $0x1,0x8(%ebp)
    0x08048404 <+16>:    jg     0x804840d <main+25>
